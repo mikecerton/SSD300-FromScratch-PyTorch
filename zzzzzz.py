@@ -14,33 +14,35 @@ pretrained_model = ssd300_vgg16(weights=weights)
 #     print(a)
 
 # for a in pretrained_model.backbone.children():
-#     print(type(a))
+#     print(a)
+
+# print(pretrained_model)
 
 li = list(pretrained_model.backbone.children())
 
-# print(li[0])          # pass
+# # print(li[0])          # pass
 
-# # print(li[1][0])       ghost
-# print(li[1][0][0:7])  # pass
-# print(li[1][0][7][0])    # pass
+print(li[1])           # ghost
+# # print(li[1][0][0:7])  # pass
+# # print(li[1][0][7][0])    # pass
 
-# print(li[1][1])       # pass
+# # print(li[1][1])       # pass
 
-# print(li[1][2])         # pass       
+# # print(li[1][2])         # pass       
 
-# print(li[1][3])         # pass
+# # print(li[1][3])         # pass
 
-# print(li[1][4])         # pass
+# # print(li[1][4])         # pass
 
-a = li[0]
-b = li[1][0][0:7]
-c = li[1][0][7][0]
+# a = li[0]
+# b = li[1][0][0:7]
+# c = li[1][0][7][0]
 
-# Combine layers into a single list
-la_list = list(a) + list(b) + [c]
+# # Combine layers into a single list
+# la_list = list(a) + list(b) + [c]
 
-# Create the combined Sequential model
-combined_seq = nn.Sequential(*la_list)
+# # Create the combined Sequential model
+# combined_seq = nn.Sequential(*la_list)
 
-# Print the result
-print(combined_seq)
+# # Print the result
+# print(combined_seq)
