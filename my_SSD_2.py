@@ -86,49 +86,90 @@ class Backbone_VGG16(nn.Module):
             )
         ])
 
-
     def forward(self, x):
+
+        outputs = []
         x = self.backbone_1(x)
-        return x
+        outputs.append(x) 
+
+        for layer in self.backbone_2:
+            x = layer(x)
+            outputs.append(x)
+
+        return outputs
     
     def load_weight_backbone_1(self):
 
         weights = SSD300_VGG16_Weights.DEFAULT
         pretrained_model = ssd300_vgg16(weights=weights)
-        
+
         li = list(pretrained_model.backbone.children())
         
         self.backbone_1.load_state_dict(li[0].state_dict())
+    
+    def load_weight_backbone_2(self):
+
+        weights = SSD300_VGG16_Weights.DEFAULT
+        pretrained_model = ssd300_vgg16(weights=weights)
+
+        li = list(pretrained_model.backbone.children())
         
+        self.backbone_2.load_state_dict(li[1].state_dict())
+    
+
+def compare_state_dicts(state_dict1, state_dict2):
+    # Check if the state_dicts have the same keys
+    if state_dict1.keys() != state_dict2.keys():
+        return False
+    
+    # Compare the actual parameters (weights and biases)
+    for key in state_dict1:
+        if not torch.equal(state_dict1[key], state_dict2[key]):
+            return False
+    
+    return True
 
 if __name__ == "__main__":
+
+
+    
+
 
     random_image = torch.rand(1, 3, 300, 300)
 
 
-
-
-
     bb = Backbone_VGG16()
-
     bb.load_weight_backbone_1()
- 
-    b1 = bb.backbone_1(random_image)
+    bb.load_weight_backbone_2()
+    b1 = bb(random_image)
+    # for a in b1:
+    #     print(a.shape)
 
-    print(b1.shape)
+    
 
 
-
-
+    # # putput of pure pre train back bone
 
     weights = SSD300_VGG16_Weights.DEFAULT
     pretrained_model = ssd300_vgg16(weights=weights)
 
-    li = list(pretrained_model.backbone.children())
+    pre = pretrained_model.backbone(random_image)
 
-    pre1 = li[0](random_image)
+    # for name, param in pre.items():
+    #     print(f"{name} : {param.shape}")
 
-    print(pre1.shape)
+    # for z in range(6):
+    #     print(type(b1[z]))
+    #     print(type(pre[str(z)]))
+
+    #     print(torch.equal(b1[z], pre[str(z)]))
+
+    pretrained_weights = list(pretrained_model.backbone.children())[0].state_dict()
+    backbone1_weights = bb.backbone_1.state_dict()
+    print(compare_state_dicts(pretrained_weights, backbone1_weights))
 
 
-    print(torch.equal(pre1, b1))
+    test_pre = list(pretrained_model.backbone.children())[0](random_image)
+    test_my = bb.backbone_1(random_image)
+    print(torch.equal(test_pre, test_my))
+
