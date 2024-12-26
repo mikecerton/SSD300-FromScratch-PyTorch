@@ -1,19 +1,17 @@
-
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torchvision.models.detection import ssd300_vgg16
 from torchvision.models.detection.ssd import SSD300_VGG16_Weights
-import torchvision.transforms as T
-from torchvision.ops import nms
-from collections import OrderedDict
-
 from PIL import Image
+import torchvision.transforms as transforms
+
 
 class Backbone_VGG16(nn.Module):
     def __init__(self):
         super(Backbone_VGG16, self).__init__()
+
+        self.scale_weight = nn.Parameter(torch.ones(512) * 20)
 
         self.backbone_1 = nn.Sequential(
             nn.Conv2d(3, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)),
@@ -89,8 +87,11 @@ class Backbone_VGG16(nn.Module):
     def forward(self, x):
 
         outputs = []
+
         x = self.backbone_1(x)
-        outputs.append(x) 
+        rescaled = self.scale_weight.view(1, -1, 1, 1) * F.normalize(x)
+
+        outputs.append(rescaled) 
 
         for layer in self.backbone_2:
             x = layer(x)
@@ -129,13 +130,29 @@ def compare_state_dicts(state_dict1, state_dict2):
     
     return True
 
+def load_and_resize_image(image_path, size=(300, 300)):
+
+    # Load the image from the file path
+    image = Image.open(image_path)
+    
+    # Define the transformation to resize and convert the image to a tensor
+    transform = transforms.Compose([
+        transforms.Resize(size),  # Resize to the specified size
+        transforms.ToTensor(),    # Convert image to tensor
+    ])
+    
+    # Apply the transformation
+    image_tensor = transform(image)
+    
+    return image_tensor
+
 if __name__ == "__main__":
 
-
-    
-
-
     random_image = torch.rand(1, 3, 300, 300)
+
+    tensor_image = load_and_resize_image("D:\SSD300-FromScratch-PyTorch\download.jpg")
+
+
 
 
     bb = Backbone_VGG16()
@@ -148,7 +165,6 @@ if __name__ == "__main__":
     
 
 
-    # # putput of pure pre train back bone
 
     weights = SSD300_VGG16_Weights.DEFAULT
     pretrained_model = ssd300_vgg16(weights=weights)
@@ -158,18 +174,10 @@ if __name__ == "__main__":
     # for name, param in pre.items():
     #     print(f"{name} : {param.shape}")
 
-    # for z in range(6):
-    #     print(type(b1[z]))
-    #     print(type(pre[str(z)]))
+    for z in range(6):
+        print(b1[z].shape)
+        print(pre[str(z)].shape)
 
-    #     print(torch.equal(b1[z], pre[str(z)]))
+        print(torch.equal(b1[z], pre[str(z)]))
 
-    pretrained_weights = list(pretrained_model.backbone.children())[0].state_dict()
-    backbone1_weights = bb.backbone_1.state_dict()
-    print(compare_state_dicts(pretrained_weights, backbone1_weights))
-
-
-    test_pre = list(pretrained_model.backbone.children())[0](random_image)
-    test_my = bb.backbone_1(random_image)
-    print(torch.equal(test_pre, test_my))
 

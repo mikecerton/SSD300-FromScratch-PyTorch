@@ -1,4 +1,4 @@
-from my_SSD import my_SSD
+
 from torchvision.models.detection import ssd300_vgg16
 from torchvision.models.detection.ssd import SSD300_VGG16_Weights
 import torchvision
@@ -14,16 +14,16 @@ pretrained_model = ssd300_vgg16(weights=weights)
 # for a in pretrained_model.head.children():
 #     print(a)
 
-# for a in pretrained_model.backbone.children():
-#     print(a)
+for a in pretrained_model.backbone.children():
+    print(a)
 
 # print(pretrained_model)
 
-li = list(pretrained_model.backbone.children())
+# li = list(pretrained_model.backbone.children())
 
 # # print(li[0])          # pass
 
-print(li[1])           # ghost
+# print(li[1])           # ghost
 # # print(li[1][0][0:7])  # pass
 # # print(li[1][0][7][0])    # pass
 
