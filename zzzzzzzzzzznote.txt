@@ -23,3 +23,47 @@ output = [
 # (N, 4, n_classes)
 
 ]
+
+loca_head
+
+input = [
+
+conv4_3_out = x                         # (N, 512, 38, 38)
+conv7_out = x                           # (N, 1024, 19, 19)
+conv8_2_out = x                         # (N, 512, 10, 10) ; output of conv8_2 for detection head
+conv9_2_out = x                         # (N, 256, 5, 5) ; output of conv9_2 for detection head
+conv10_2_out = x                        # (N, 256, 3, 3) ; output of conv10_2 for detection head
+conv11_2_out = F.relu(self.conv11_2(x)) # (N, 256, 1, 1) ; output of conv11_2 for detection head
+
+]
+
+output = [
+
+# (N, 5776, 4)
+# (N, 2166, 4)
+# (N, 600, 4)
+# (N, 150, 4)
+# (N, 36, 4)
+# (N, 4, 4)
+
+]
+
+
+ssd_backbone
+
+input = [
+
+image tensor shape (N, 3, 300, 300)
+
+]
+
+putput = [
+
+conv4_3_out = x                         # (N, 512, 38, 38)
+conv7_out = x                           # (N, 1024, 19, 19)
+conv8_2_out = x                         # (N, 512, 10, 10) ; output of conv8_2 for detection head
+conv9_2_out = x                         # (N, 256, 5, 5) ; output of conv9_2 for detection head
+conv10_2_out = x                        # (N, 256, 3, 3) ; output of conv10_2 for detection head
+conv11_2_out = F.relu(self.conv11_2(x)) # (N, 256, 1, 1) ; output of conv11_2 for detection head
+
+]
