@@ -11,14 +11,12 @@ class SSD_Head(nn.Module):
     def __init__(self, n_class = 91, n_bbox = None):
         super(SSD_Head, self).__init__()
 
-        self.n_class = int(n_class)
+
+        self.n_class = n_class
         self.n_bbox = n_bbox
 
         self.cls_head = classi_head(self.n_class, self.n_bbox)
-        self.loc_head = Loca_head(self.n_bbox)
-
-        self.cls_head.load_weight_ClsHead()
-        self.loc_head.load_weight_LocHead()
+        self.loc_head = Loca_head(n_bbox)
 
     def forward(self, conv4_3_out, conv7_out, conv8_2_out, conv9_2_out, conv10_2_out, conv11_2_out):
         class_score = self.cls_head(conv4_3_out, conv7_out, conv8_2_out, conv9_2_out, conv10_2_out, conv11_2_out)
@@ -29,6 +27,9 @@ class SSD_Head(nn.Module):
 class classi_head(nn.Module):
     def __init__(self, n_class=91, n_bbox=None):
         super(classi_head, self).__init__()
+
+        self.n_class = n_class
+        self.n_bbox = n_bbox
 
         self.cls_head = nn.ModuleList([
             nn.Conv2d(512, n_class * n_bbox['conv4_3'], kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)),
@@ -54,9 +55,8 @@ class classi_head(nn.Module):
 
         for idx, out in enumerate(conv_outs):
             # Reshape to (N, H * W * num_boxes, n_classes)
-            num_boxes = out.size(1) // n_class
             reshaped = out.permute(0, 2, 3, 1)  # (N, H, W, C)
-            reshaped = reshaped.reshape(batch_size, -1, n_class)  # (N, H * W * num_boxes, n_classes)
+            reshaped = reshaped.reshape(batch_size, -1, self.n_class)  # (N, H * W * num_boxes, n_classes)
             reshaped_outs.append(reshaped)
 
         return reshaped_outs
@@ -150,6 +150,7 @@ if __name__ == "__main__":
     conv11_2_out = torch.randn(1, 256, 1, 1)
 
     my_head = SSD_Head(n_class, n_bbox)
+    my_head.load_head_weight()
     class_score, loc_bbox = my_head(conv4_3_out, conv7_out, conv8_2_out, conv9_2_out, conv10_2_out, conv11_2_out)
 
     """Print output shapes"""

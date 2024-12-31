@@ -95,7 +95,11 @@ class ssd_backbone(nn.Module):
             x = layer(x)
             outputs.append(x)
 
-        return outputs
+        return outputs[0], outputs[1], outputs[2], outputs[3], outputs[4], outputs[5], 
+    
+    def load_backbone_weight(self):
+        self.load_weight_backbone_1()
+        self.load_weight_backbone_2()
     
     def load_weight_backbone_1(self):
 
@@ -123,22 +127,19 @@ if __name__ == "__main__":
     bb = ssd_backbone()
     bb.load_weight_backbone_1()
     bb.load_weight_backbone_2()
-    b1 = bb(random_image)
-    # for a in b1:
-    #     print(a.shape)
+    conv4_3_out, conv7_out, conv8_2_out, conv9_2_out, conv10_2_out, conv11_2_out = bb(random_image)
+
+    print("conv4_3_out shape:", conv4_3_out.shape)
+    print("conv7_out shape:", conv7_out.shape)
+    print("conv8_2_out shape:", conv8_2_out.shape)
+    print("conv9_2_out shape:", conv9_2_out.shape)
+    print("conv10_2_out shape:", conv10_2_out.shape)
+    print("conv11_2_out shape:", conv11_2_out.shape)
 
 
-    weights = SSD300_VGG16_Weights.DEFAULT
-    pretrained_model = ssd300_vgg16(weights=weights)
+    # weights = SSD300_VGG16_Weights.DEFAULT
+    # pretrained_model = ssd300_vgg16(weights=weights)
 
-    pre = pretrained_model.backbone(random_image)
+    # conv4_3_out, conv7_out, conv8_2_out, conv9_2_out, conv10_2_out, conv11_2_out = pretrained_model.backbone(random_image)
 
-    # for name, param in pre.items():
-    #     print(f"{name} : {param.shape}")
-
-    for z in range(6):
-        print(b1[z].shape)
-        print(pre[str(z)].shape)
-
-        print(torch.equal(b1[z], pre[str(z)]))
 
